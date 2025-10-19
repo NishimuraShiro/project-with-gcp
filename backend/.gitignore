@@ -1,0 +1,17 @@
+node_modules
+dist
+.env
+logs
+*.log
+coverage
+.DS_Store
+.idea
+.vscode
+npm-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
