@@ -1,0 +1,17 @@
+# Environment files
+.env
+.env.local
+.env*.local
+
+# OS
+.DS_Store
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml

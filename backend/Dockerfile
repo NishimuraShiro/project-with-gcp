@@ -1,7 +1,14 @@
-FROM node:18-alpine
+FROM node:20-alpine
+
 WORKDIR /app
+
+# 依存関係をインストール
 COPY package*.json ./
-RUN npm ci --only=production
+
+# ソースコードをコピー
 COPY . .
+
 EXPOSE 8080
-CMD ["node", "server.js"]
+
+# デフォルトコマンド（docker-compose.ymlでオーバーライド可能）
+CMD ["sh", "-c", "npm install && npm run dev"]

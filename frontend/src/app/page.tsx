@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 interface Todo {
   id: number;
   title: string;
-  description: string;
+  description: string | null;
   completed: boolean;
   created_at: string;
   updated_at: string;
@@ -50,7 +50,7 @@ export default function Home() {
       const response = await fetch(`${API_URL}/api/todos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle, description: newDescription })
+        body: JSON.stringify({ title: newTitle, description: newDescription }),
       });
 
       if (!response.ok) throw new Error("Failed to create todo");
@@ -70,7 +70,7 @@ export default function Home() {
       const response = await fetch(`${API_URL}/api/todos/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ completed: !completed })
+        body: JSON.stringify({ completed: !completed }),
       });
 
       if (!response.ok) throw new Error("Failed to update todo");
@@ -87,7 +87,7 @@ export default function Home() {
 
     try {
       const response = await fetch(`${API_URL}/api/todos/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
 
       if (!response.ok) throw new Error("Failed to delete todo");
@@ -99,130 +99,109 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
-          📝 Todo App
+    <div className="min-h-screen py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
+          Todo App
         </h1>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
           </div>
         )}
 
         {/* Todo追加フォーム */}
-        <form
-          onSubmit={addTodo}
-          className="bg-white rounded-lg shadow-md p-6 mb-8"
-        >
+        <form onSubmit={addTodo} className="mb-8 bg-white p-6 rounded-lg shadow-md">
           <div className="mb-4">
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+              タイトル
+            </label>
             <input
               type="text"
+              id="title"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Todoのタイトル"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Todoのタイトルを入力"
+              required
             />
           </div>
           <div className="mb-4">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+              説明（オプション）
+            </label>
             <textarea
+              id="description"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
-              placeholder="説明（オプション）"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Todoの説明を入力"
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors font-semibold"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium"
           >
             追加
           </button>
         </form>
 
         {/* Todoリスト */}
-        <div className="space-y-3">
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            </div>
-          ) : todos.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
-              Todoがありません。新しいTodoを追加してください！
-            </div>
-          ) : (
-            todos.map((todo) => (
+        {loading ? (
+          <div className="text-center py-8 text-gray-500">読み込み中...</div>
+        ) : todos.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Todoがありません。上のフォームから追加してください。
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {todos.map((todo) => (
               <div
                 key={todo.id}
-                className="bg-white rounded-lg shadow-md p-5 hover:shadow-lg transition-shadow"
+                className={`bg-white p-6 rounded-lg shadow-md transition-all ${
+                  todo.completed ? "opacity-60" : ""
+                }`}
               >
-                <div className="flex items-start gap-4">
-                  <input
-                    type="checkbox"
-                    checked={todo.completed}
-                    onChange={() => toggleTodo(todo.id, todo.completed)}
-                    className="mt-1 h-5 w-5 text-blue-500 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                  />
-                  <div className="flex-1">
-                    <h3
-                      className={`text-lg font-semibold ${
-                        todo.completed
-                          ? "line-through text-gray-400"
-                          : "text-gray-800"
-                      }`}
-                    >
-                      {todo.title}
-                    </h3>
-                    {todo.description && (
-                      <p
-                        className={`mt-1 ${
-                          todo.completed ? "text-gray-400" : "text-gray-600"
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-4 flex-1">
+                    <input
+                      type="checkbox"
+                      checked={todo.completed}
+                      onChange={() => toggleTodo(todo.id, todo.completed)}
+                      className="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                    />
+                    <div className="flex-1">
+                      <h3
+                        className={`text-lg font-semibold mb-2 ${
+                          todo.completed ? "line-through text-gray-500" : "text-gray-800"
                         }`}
                       >
-                        {todo.description}
+                        {todo.title}
+                      </h3>
+                      {todo.description && (
+                        <p className={`text-gray-600 mb-2 ${todo.completed ? "line-through" : ""}`}>
+                          {todo.description}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-400">
+                        作成日時: {new Date(todo.created_at).toLocaleString("ja-JP")}
                       </p>
-                    )}
-                    <p className="text-xs text-gray-400 mt-2">
-                      作成日:{" "}
-                      {new Date(todo.created_at).toLocaleString("ja-JP")}
-                    </p>
+                    </div>
                   </div>
                   <button
                     onClick={() => deleteTodo(todo.id)}
-                    className="text-red-500 hover:text-red-700 font-semibold px-3 py-1 rounded hover:bg-red-50 transition-colors"
+                    className="ml-4 text-red-600 hover:text-red-800 font-medium transition-colors"
                   >
                     削除
                   </button>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-
-        {/* 統計情報 */}
-        {todos.length > 0 && (
-          <div className="mt-8 bg-white rounded-lg shadow-md p-4 flex justify-around text-center">
-            <div>
-              <p className="text-2xl font-bold text-blue-500">{todos.length}</p>
-              <p className="text-gray-600 text-sm">総数</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-green-500">
-                {todos.filter((t) => t.completed).length}
-              </p>
-              <p className="text-gray-600 text-sm">完了</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-orange-500">
-                {todos.filter((t) => !t.completed).length}
-              </p>
-              <p className="text-gray-600 text-sm">未完了</p>
-            </div>
+            ))}
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

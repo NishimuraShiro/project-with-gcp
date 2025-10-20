@@ -1,15 +1,14 @@
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
+FROM node:20-alpine
 
-FROM node:18-alpine
 WORKDIR /app
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
+
+# 依存関係をインストール
+COPY package*.json ./
+
+# ソースコードをコピー
+COPY . .
+
 EXPOSE 3000
-CMD ["npm", "start"]
+
+# デフォルトコマンド（起動時にnpm installを実行）
+CMD ["sh", "-c", "npm install && npm run dev"]
