@@ -15,3 +15,15 @@
 
 # Docker
 docker-compose.override.yml
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/*.tfvars
+!terraform/terraform.tfvars.example
+
+# Node modules
+node_modules/
+*/node_modules/

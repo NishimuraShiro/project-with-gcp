@@ -9,7 +9,7 @@ This is a full-stack Todo application built with TypeScript, consisting of three
 - **Backend**: Express.js REST API with TypeScript and Node.js 20
 - **Database**: MySQL 8.0
 
-The application is fully containerized using Docker and Docker Compose.
+The application is fully containerized using Docker and Docker Compose, and can be deployed to Google Cloud Platform (GCP) using Terraform.
 
 ## Development Commands
 
@@ -239,3 +239,101 @@ When modifying the frontend:
 - Strict mode enabled
 - Path aliases: `@/*` maps to `./src/*`
 - JSX: preserve (handled by Next.js)
+
+## GCP Deployment
+
+This project can be deployed to Google Cloud Platform using Terraform and Cloud Run.
+
+### Infrastructure Components
+
+**Cloud Services**:
+- **Cloud Run**: Serverless container platform for backend and frontend
+- **Cloud SQL**: Managed MySQL 8.0 database
+- **VPC Connector**: Private connection between Cloud Run and Cloud SQL
+- **Artifact Registry**: Docker image storage
+- **Secret Manager**: Secure storage for database credentials
+- **Cloud Build**: CI/CD pipeline (optional)
+
+**Terraform Configuration** (`terraform/`):
+- `main.tf` - Provider and API enablement
+- `network.tf` - VPC, subnet, and VPC connector
+- `cloudsql.tf` - Cloud SQL instance and database
+- `cloudrun.tf` - Backend and frontend Cloud Run services
+- `secrets.tf` - Secret Manager configuration
+- `artifact_registry.tf` - Docker repository
+- `variables.tf` - Input variables
+- `outputs.tf` - Output values (URLs, database info)
+
+### Deployment Process
+
+1. **Initial Setup**:
+   ```bash
+   gcloud config set project YOUR_PROJECT_ID
+   ./scripts/setup-gcp.sh
+   ```
+
+2. **Configure Terraform**:
+   ```bash
+   cd terraform
+   cp terraform.tfvars.example terraform.tfvars
+   # Edit terraform.tfvars with your project details
+   ```
+
+3. **Deploy**:
+   ```bash
+   ./scripts/deploy.sh
+   ```
+
+4. **Access Application**:
+   ```bash
+   terraform -chdir=terraform output frontend_url
+   ```
+
+### Production Docker Images
+
+Separate production Dockerfiles are provided:
+- `backend/Dockerfile.prod` - Multi-stage build with TypeScript compilation
+- `frontend/Dockerfile.prod` - Optimized Next.js standalone build
+
+Key differences from development:
+- TypeScript compiled to JavaScript
+- Dependencies pruned to production only
+- Non-root user for security
+- Optimized layer caching
+
+### CI/CD with Cloud Build
+
+`cloudbuild.yaml` provides automated deployment:
+1. Build backend and frontend Docker images
+2. Push images to Artifact Registry
+3. Deploy to Cloud Run
+
+Connect to GitHub for automatic deployment on push.
+
+### Cost Estimation
+
+Approximate monthly costs (light usage):
+- Cloud Run: $5-10
+- Cloud SQL (db-f1-micro): $7-15
+- VPC Connector: $7
+- Total: ~$20-32/month
+
+See `GCP_DEPLOYMENT.md` for detailed deployment guide and troubleshooting.
+
+### Monitoring and Management
+
+**View Logs**:
+```bash
+gcloud run logs read todo-backend --region=asia-northeast1
+gcloud run logs read todo-frontend --region=asia-northeast1
+```
+
+**Database Connection**:
+```bash
+cloud-sql-proxy YOUR_PROJECT_ID:asia-northeast1:todo-app-mysql
+```
+
+**Cleanup**:
+```bash
+cd terraform && terraform destroy
+```

@@ -11,7 +11,20 @@ interface Todo {
   updated_at: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+// 環境に応じてAPIのURLを決定
+const getApiUrl = () => {
+  // ブラウザで実行中の場合
+  if (typeof window !== 'undefined') {
+    // 本番環境（Cloud Run）の場合
+    if (window.location.hostname.includes('run.app')) {
+      return 'https://todo-backend-908945350939.asia-northeast1.run.app';
+    }
+  }
+  // ローカル開発環境またはビルド時
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+};
+
+const API_URL = getApiUrl();
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([]);

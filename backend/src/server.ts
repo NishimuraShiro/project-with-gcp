@@ -30,9 +30,20 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 // データベース初期化とサーバー起動
 async function startServer() {
   try {
-    await initDatabase();
-    app.listen(PORT, () => {
+    // データベース初期化（失敗してもサーバーは起動する）
+    try {
+      await initDatabase();
+      console.log('Database initialized successfully');
+    } catch (dbError) {
+      console.error('Database initialization warning:', dbError);
+      console.log('Server will start without database connection');
+    }
+
+    // 0.0.0.0 でリッスン（Cloud Run要件）
+    app.listen(Number(PORT), '0.0.0.0', () => {
       console.log(`Express server running on port ${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV}`);
+      console.log(`DB_HOST: ${process.env.DB_HOST || 'not set'}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

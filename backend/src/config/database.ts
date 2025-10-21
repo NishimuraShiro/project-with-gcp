@@ -15,6 +15,15 @@ export const pool = mysql.createPool({
 
 export async function initDatabase(): Promise<void> {
   try {
+    console.log('Attempting to connect to database...');
+    console.log('DB_HOST:', process.env.DB_HOST);
+    console.log('DB_USER:', process.env.DB_USER);
+    console.log('DB_NAME:', process.env.DB_NAME);
+
+    // Test connection
+    await pool.query('SELECT 1');
+    console.log('Database connection successful');
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS todos (
         id INT AUTO_INCREMENT PRIMARY KEY,

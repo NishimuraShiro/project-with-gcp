@@ -1,0 +1,10 @@
+project_id = "your-gcp-project-id"
+region     = "asia-northeast1"
+zone       = "asia-northeast1-a"
+
+db_user     = "todoapp_user"
+db_password = "your-secure-password-here"
+db_name     = "todo_db"
+
+backend_image  = "asia-northeast1-docker.pkg.dev/your-gcp-project-id/todo-app/backend:latest"
+frontend_image = "asia-northeast1-docker.pkg.dev/your-gcp-project-id/todo-app/frontend:latest"
