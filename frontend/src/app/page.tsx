@@ -14,10 +14,10 @@ interface Todo {
 // 環境に応じてAPIのURLを決定
 const getApiUrl = () => {
   // ブラウザで実行中の場合
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     // 本番環境（Cloud Run）の場合
-    if (window.location.hostname.includes('run.app')) {
-      return 'https://todo-backend-908945350939.asia-northeast1.run.app';
+    if (window.location.hostname.includes("run.app")) {
+      return "https://todo-backend-908945350939.asia-northeast1.run.app";
     }
   }
   // ローカル開発環境またはビルド時
@@ -63,7 +63,7 @@ export default function Home() {
       const response = await fetch(`${API_URL}/api/todos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle, description: newDescription }),
+        body: JSON.stringify({ title: newTitle, description: newDescription })
       });
 
       if (!response.ok) throw new Error("Failed to create todo");
@@ -83,7 +83,7 @@ export default function Home() {
       const response = await fetch(`${API_URL}/api/todos/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ completed: !completed }),
+        body: JSON.stringify({ completed: !completed })
       });
 
       if (!response.ok) throw new Error("Failed to update todo");
@@ -100,7 +100,7 @@ export default function Home() {
 
     try {
       const response = await fetch(`${API_URL}/api/todos/${id}`, {
-        method: "DELETE",
+        method: "DELETE"
       });
 
       if (!response.ok) throw new Error("Failed to delete todo");
@@ -115,7 +115,7 @@ export default function Home() {
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
-          Todo App
+          Todo Appだよ
         </h1>
 
         {error && (
@@ -125,9 +125,15 @@ export default function Home() {
         )}
 
         {/* Todo追加フォーム */}
-        <form onSubmit={addTodo} className="mb-8 bg-white p-6 rounded-lg shadow-md">
+        <form
+          onSubmit={addTodo}
+          className="mb-8 bg-white p-6 rounded-lg shadow-md"
+        >
           <div className="mb-4">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               タイトル
             </label>
             <input
@@ -141,7 +147,10 @@ export default function Home() {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               説明（オプション）
             </label>
             <textarea
@@ -188,18 +197,25 @@ export default function Home() {
                     <div className="flex-1">
                       <h3
                         className={`text-lg font-semibold mb-2 ${
-                          todo.completed ? "line-through text-gray-500" : "text-gray-800"
+                          todo.completed
+                            ? "line-through text-gray-500"
+                            : "text-gray-800"
                         }`}
                       >
                         {todo.title}
                       </h3>
                       {todo.description && (
-                        <p className={`text-gray-600 mb-2 ${todo.completed ? "line-through" : ""}`}>
+                        <p
+                          className={`text-gray-600 mb-2 ${
+                            todo.completed ? "line-through" : ""
+                          }`}
+                        >
                           {todo.description}
                         </p>
                       )}
                       <p className="text-xs text-gray-400">
-                        作成日時: {new Date(todo.created_at).toLocaleString("ja-JP")}
+                        作成日時:{" "}
+                        {new Date(todo.created_at).toLocaleString("ja-JP")}
                       </p>
                     </div>
                   </div>
